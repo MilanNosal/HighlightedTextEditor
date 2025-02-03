@@ -67,7 +67,17 @@ public struct HighlightedTextEditor: UIViewRepresentable, HighlightingTextEditor
         updateTextViewModifiers(uiView)
         runIntrospect(uiView)
         uiView.isScrollEnabled = true
-        uiView.selectedTextRange = context.coordinator.selectedTextRange
+        if let range = context.coordinator.selectedTextRange {
+            let rangeOffset = uiView.offset(from: uiView.beginningOfDocument, to: range.end)
+            let documentOffset = uiView.offset(from: uiView.beginningOfDocument, to: uiView.endOfDocument)
+            if rangeOffset <= documentOffset {
+                uiView.selectedTextRange = range
+            } else {
+                uiView.selectedTextRange = nil
+            }
+        } else {
+            uiView.selectedTextRange = nil
+        }
         context.coordinator.updatingUIView = false
     }
 
